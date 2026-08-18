@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>居家托育電訪紀錄格式</title>
+<style>
+  :root{
+    --navy:#0f2942;
+    --navy-light:#1c3f5f;
+    --teal:#1a7a72;
+    --teal-light:#2ea89c;
+    --mint:#e8f6f3;
+    --mint-border:#c3e6df;
+    --text:#1e2a32;
+    --muted:#5c6b73;
+    --bg:#f4f8f8;
+    --white:#ffffff;
+    --parent:#b4652f;
+    --parent-bg:#fbeee2;
+    --caregiver:#1a7a72;
+    --caregiver-bg:#e8f6f3;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Microsoft JhengHei","微軟正黑體",-apple-system,BlinkMacSystemFont,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.7;
+  }
+  header{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);
+    color:#fff;
+    padding:28px 20px 24px;
+    text-align:center;
+  }
+  header h1{
+    margin:0 0 6px;
+    font-size:1.5rem;
+    letter-spacing:1px;
+  }
+  header p{
+    margin:0;
+    font-size:0.9rem;
+    color:#cfe3e0;
+  }
+  .search-bar{
+    max-width:900px;
+    margin:20px auto 0;
+    padding:0 20px;
+  }
+  .search-bar input{
+    width:100%;
+    padding:12px 16px;
+    font-size:1rem;
+    border:2px solid var(--mint-border);
+    border-radius:10px;
+    font-family:inherit;
+    outline:none;
+    transition:border-color .2s;
+  }
+  .search-bar input:focus{
+    border-color:var(--teal-light);
+  }
+
+  /* 分類切換頁籤 */
+  .filter-bar{
+    max-width:900px;
+    margin:16px auto 0;
+    padding:0 20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .filter-btn{
+    flex:1;
+    min-width:100px;
+    padding:10px 14px;
+    border-radius:10px;
+    border:2px solid var(--mint-border);
+    background:var(--white);
+    color:var(--muted);
+    font-family:inherit;
+    font-size:0.9rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .15s;
+    text-align:center;
+  }
+  .filter-btn:hover{
+    border-color:var(--teal-light);
+  }
+  .filter-btn.active[data-filter="all"]{
+    background:var(--navy);
+    color:#fff;
+    border-color:var(--navy);
+  }
+  .filter-btn.active[data-filter="parent"]{
+    background:var(--parent);
+    color:#fff;
+    border-color:var(--parent);
+  }
+  .filter-btn.active[data-filter="caregiver"]{
+    background:var(--caregiver);
+    color:#fff;
+    border-color:var(--caregiver);
+  }
+
+  /* 總覽 */
+  .toc-wrap{
+    max-width:900px;
+    margin:18px auto 0;
+    padding:0 20px;
+  }
+  .toc-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .toc-header span{
+    font-size:0.9rem;
+    font-weight:700;
+    color:var(--navy);
+  }
+  .copy-all-btn{
+    background:var(--navy);
+    color:#fff;
+    border:none;
+    padding:8px 16px;
+    border-radius:8px;
+    font-size:0.82rem;
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .15s, transform .1s;
+  }
+  .copy-all-btn:hover{
+    background:var(--navy-light);
+  }
+  .copy-all-btn:active{
+    transform:scale(0.96);
+  }
+  .toc-box{
+    background:var(--white);
+    border:1px solid var(--mint-border);
+    border-radius:12px;
+    padding:14px;
+  }
+  .toc-group{
+    margin-bottom:10px;
+  }
+  .toc-group:last-child{
+    margin-bottom:0;
+  }
+  .toc-group-label{
+    font-size:0.78rem;
+    font-weight:700;
+    color:var(--muted);
+    margin-bottom:6px;
+    display:block;
+  }
+  .toc-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .toc-item{
+    border:1px solid var(--mint-border);
+    padding:7px 14px;
+    border-radius:20px;
+    font-size:0.85rem;
+    cursor:pointer;
+    transition:background .15s, color .15s;
+    white-space:nowrap;
+  }
+  .toc-item.parent{
+    background:var(--parent-bg);
+    color:var(--parent);
+  }
+  .toc-item.parent:hover{
+    background:var(--parent);
+    color:#fff;
+  }
+  .toc-item.caregiver{
+    background:var(--caregiver-bg);
+    color:var(--caregiver);
+  }
+  .toc-item.caregiver:hover{
+    background:var(--caregiver);
+    color:#fff;
+  }
+
+  .container{
+    max-width:900px;
+    margin:0 auto;
+    padding:24px 20px 60px;
+  }
+
+  .section-heading{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:30px 0 14px;
+    font-size:1.1rem;
+    font-weight:700;
+    color:var(--navy);
+  }
+  .section-heading:first-child{
+    margin-top:0;
+  }
+  .section-heading .dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+  }
+  .section-heading.parent .dot{ background:var(--parent); }
+  .section-heading.caregiver .dot{ background:var(--caregiver); }
+  .section-heading .count{
+    font-size:0.78rem;
+    font-weight:400;
+    color:var(--muted);
+  }
+
+  .card{
+    background:var(--white);
+    border:1px solid var(--mint-border);
+    border-radius:14px;
+    margin-bottom:18px;
+    overflow:hidden;
+    box-shadow:0 2px 8px rgba(15,41,66,0.06);
+    transition:box-shadow .2s;
+  }
+  .card:hover{
+    box-shadow:0 4px 14px rgba(15,41,66,0.1);
+  }
+  .card-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--mint);
+    padding:14px 18px;
+    border-bottom:1px solid var(--mint-border);
+    gap:12px;
+  }
+  .card[data-category="parent"] .card-header{
+    background:var(--parent-bg);
+    border-bottom-color:#eccaad;
+  }
+  .card-title{
+    font-size:1.05rem;
+    font-weight:700;
+    color:var(--navy);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .tag{
+    font-size:0.7rem;
+    color:#fff;
+    padding:2px 9px;
+    border-radius:20px;
+    font-weight:400;
+    white-space:nowrap;
+  }
+  .tag.caregiver{ background:var(--caregiver); }
+  .tag.parent{ background:var(--parent); }
+
+  .action-buttons{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-shrink:0;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .copy-btn{
+    flex-shrink:0;
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    padding:8px 16px;
+    border-radius:8px;
+    font-size:0.85rem;
+    cursor:pointer;
+    font-family:inherit;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:background .15s, transform .1s;
+  }
+  .back-btn{
+    flex-shrink:0;
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--mint-border);
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:0.8rem;
+    cursor:pointer;
+    font-family:inherit;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    transition:background .15s, color .15s, border-color .15s;
+    white-space:nowrap;
+  }
+  .back-btn:hover{
+    background:var(--mint);
+    color:var(--navy);
+    border-color:var(--teal-light);
+  }
+  .back-btn:active{
+    transform:scale(0.96);
+  }
+  .card[data-category="parent"] .copy-btn{
+    background:var(--parent);
+  }
+  .copy-btn:hover{
+    opacity:0.85;
+  }
+  .copy-btn:active{
+    transform:scale(0.96);
+  }
+  .copy-btn.copied{
+    background:var(--navy) !important;
+    opacity:1;
+  }
+  .card-body{
+    padding:18px 20px;
+    white-space:pre-wrap;
+    font-size:0.95rem;
+    cursor:text;
+    user-select:text;
+  }
+  .card-body .placeholder{
+    color:var(--teal);
+    font-weight:600;
+    background:var(--mint);
+    padding:0 3px;
+    border-radius:3px;
+  }
+  .card[data-category="parent"] .card-body .placeholder{
+    color:var(--parent);
+    background:var(--parent-bg);
+  }
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:0.8rem;
+    padding:20px;
+  }
+  .no-result{
+    text-align:center;
+    color:var(--muted);
+    padding:40px 0;
+    display:none;
+  }
+  .card.flash{
+    animation:flashHighlight 1.2s ease;
+  }
+  @keyframes flashHighlight{
+    0%{box-shadow:0 0 0 3px var(--teal-light);}
+    100%{box-shadow:0 2px 8px rgba(15,41,66,0.06);}
+  }
+  .toast{
+    position:fixed;
+    bottom:28px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--navy);
+    color:#fff;
+    padding:10px 22px;
+    border-radius:30px;
+    font-size:0.9rem;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s, transform .25s;
+    z-index:100;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:14px;left:14px;z-index:9999;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.92);color:#122B3C;text-decoration:none;font-family:'Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif;font-size:13.5px;font-weight:700;padding:8px 14px;border-radius:999px;box-shadow:0 2px 10px rgba(0,0,0,0.18);border:1px solid rgba(0,0,0,0.06);">← 回首頁</a>
+
+<header>
+  <h1>📞 居家托育電訪紀錄格式</h1>
+  <p>點選右上角「複製」即可貼上修改；括號中為需依個案填寫的欄位</p>
+</header>
+
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="🔍 搜尋電訪類型（例如：終托、體檢、搬家…）" oninput="filterCards()">
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn active" data-filter="all" onclick="setCategoryFilter('all')">全部</button>
+  <button class="filter-btn" data-filter="parent" onclick="setCategoryFilter('parent')">👪 家長</button>
+  <button class="filter-btn" data-filter="caregiver" onclick="setCategoryFilter('caregiver')">🧑‍🍼 保母</button>
+</div>
+
+<div class="toc-wrap" id="tocWrap">
+  <div class="toc-header">
+    <span>📑 電訪總覽（點選跳至該則）</span>
+    <button class="copy-all-btn" onclick="copyAll()">📋 複製全部</button>
+  </div>
+  <div class="toc-box">
+    <div class="toc-group">
+      <span class="toc-group-label">👪 家長類</span>
+      <div class="toc-grid" id="tocParent"></div>
+    </div>
+    <div class="toc-group">
+      <span class="toc-group-label">🧑‍🍼 保母類</span>
+      <div class="toc-grid" id="tocCaregiver"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="container">
+
+  <div class="section-heading parent" data-section="parent">
+    <span class="dot"></span> 👪 家長類電訪 <span class="count">(4 則)</span>
+  </div>
+
+  <div class="card" id="card-1" data-category="parent" data-keywords="終托 家長電訪 終止托育">
+    <div class="card-header">
+      <div class="card-title">(家長電訪) 終托電訪 <span class="tag parent">家長</span></div>
+      <div class="action-buttons">
+        <button class="copy-btn" onclick="copyCard(this)">📋 複製</button>
+        <button class="back-btn" onclick="backToToc()">🔝 回到總覽</button>
+      </div>
+    </div>
+    <div class="card-body">聯絡對象：<span class="placeholder">(幼兒爸爸或媽媽)</span>
+
+1. 托育人員<span class="placeholder">(通報日期)</span>回傳托兒終托資料。
+
+2. 關心保親合作狀況或對保母回饋意見：
+
+3. <span class="placeholder">(準公)</span>因幼兒未滿三歲，提醒如未轉托其他保母或托育機構，需到區公所申請育兒津貼，以免權益受損。
+
+4. 訪員電聯家長確認以下事項：
+(1) 終托原因。
+(2) 訪員表示因孩子有在請領準公托育補助，故需回傳異動單。
+(3) 訪員向家長確認費用是否結清。
+(4) 訪員關心家長與托育人員合作狀況：</div>
+  </div>
+
+  <div class="card" id="card-3" data-category="parent" data-keywords="補助 契約確認 家長電訪">
+    <div class="card-header">
+      <div class="card-title">(家長電訪) 補助&契約確認電訪 <span class="tag parent">家長</span></div>
+      <div class="action-buttons">
+        <button class="copy-btn" onclick="copyCard(this)">📋 複製</button>
+        <button class="back-btn" onclick="backToToc()">🔝 回到總覽</button>
+      </div>
+    </div>
+    <div class="card-body">聯絡對象：<span class="placeholder">(幼兒爸爸或媽媽)</span>
+
+1. 已和家長確認<span class="placeholder">(托育人員提供給中心之收費資料與家長確認的契約與收費內容)</span>
+A. 開始收托日期、每日送托時間與契約一致。
+B. 確實為簽約人自行參與簽約。
+C. 家長了解契約內容與相關約定。
+D. 訪員口述契約收費（托育費、副食品費、年節禮金或禮品【中秋節及端午節】、年終獎金、延托費等）約定，確定與家長認知相同。
+E. 其他特殊約定（第 <span class="placeholder">___</span> 條）：訪員口述此項約定，確認家長充分了解且同意。
+
+2. 提醒家長應妥善收存托育契書正本，且保親雙方各持一份正本，做為日後合作的必要保障；若契約約定再修訂或變更，請保親雙方正本同步修訂並於修訂處旁保親雙方簽章。
+
+3. 告知家長有關家長個人資料使用的範圍用於居家托育相關福利措施之資料運用，不會用於他處，並確認家長已簽署家長個資同意書。
+
+4. 說明本中心申訴管道，如對托育人員、中心有需要申訴事項，可電洽本中心。
+
+5. 托育補助申請：
+□是，訪員已說明：
+申辦托補文件下載途徑、需檢附之相關附件影本均需首頁簽章（托兒及委託人之身分證明文件、契約書、郵局存摺影本，以及報表填寫內文規則、托育日起15日內備齊文件含補件…等注意事項）
+重點說明：申請補助金額（若實支托育費用低於補助金額者，核實補助）
+提醒補助為核實支付，在有請領補助之狀況下，如托兒有請假超過14天、有終托之情形、當月有退費且實際支付金額已低於補助金額時，需填寫異動單，另補助審核需2-3個月，如後續未收到補助款項，請主動聯繫中心，家長表示知悉。
+□否，托育人員無準公身份，無法申請補助。
+□否，托育型態不符。
+□否，其他：
+□其他</div>
+  </div>
+
+  <div class="card" id="card-4" data-category="parent" data-keywords="新收托 趴睡 準公共化">
+    <div class="card-header">
+      <div class="card-title">新收托電訪 <span class="tag parent">家長</span></div>
+      <div class="action-buttons">
+        <button class="copy-btn" onclick="copyCard(this)">📋 複製</button>
+        <button class="back-btn" onclick="backToToc()">🔝 回到總覽</button>
+      </div>
+    </div>
+    <div class="card-body">聯絡對象：<span class="placeholder">(幼兒爸爸或媽媽)</span>
+
+一、致電家長說明訪視狀況（包括提醒趴睡等）
+
+二、關心家長與保母合作狀況、與對保母回饋
+
+三、宣導收退費基準與準公共化收費規定，保母如有違反會被退出準公共化，恐影響家長權益，請家長如有超收費用狀況應通知中心。
+
+四、說明中心申訴管道，如有保親合作問題請洽中心
+
+五、確認補助是否已經申請
+
+1. 關心保親合作狀況
+2. 宣導收退費基準與準公共化收費規定
+3. 說明中心申訴管道</div>
+  </div>
+
+  <div class="card" id="card-2p" data-category="parent" data-keywords="媒合成功 保母 托育人員 家長">
+    <div class="card-header">
+      <div class="card-title">保母媒合成功電訪 <span class="tag parent">家長</span></div>
+      <div class="action-buttons">
+        <button class="copy-btn" onclick="copyCard(this)">📋 複製</button>
+        <button class="back-btn" onclick="backToToc()">🔝 回到總覽</button>
+      </div>
+    </div>
+    <div class="card-body">壹、電訪目的：媒合成功確認。
+
+貳、電訪內容：家長已和托育人員確定於<span class="placeholder">(預定開始收托日期)</span>開始進行托育。
+
+一、提醒事項：
+
+二、宣導事項：
+
+1. 家長<span class="placeholder">(家長姓名)</span>登記找在宅托育人員，預計<span class="placeholder">(預計開始托育時間)</span>開始托育，訪員於<span class="placeholder">115/1/12</span>轉介<span class="placeholder">許</span>托育人員給家長。
+
+2. 訪員與托育人員、家長確認媒合成功，預計<span class="placeholder">(初步說定開始托育時間)</span>開始托育，訪員用LINE提醒應於收托7日內回傳收托表、契約書、家長個資同意書、兒童資料卡，托育人員表示知悉。
+
+後續計畫：追蹤收托通報、並安排新收托訪視。</div>
+  </div>
+
+  <div class="section-heading caregiver" data-section="caregiver">
+    <span class="dot"></span> 🧑‍🍼 保母類電訪 <span class="count">(5 則)</span>
+  </div>
+
+  <div class="card" id="card-2" data-category="caregiver" data-keywords="媒合成功 保母 托育人員 家長">
+    <div class="card-header">
+      <div class="card-title">保母媒合成功電訪 <span class="tag caregiver">保母</span></div>
+      <div class="action-buttons">
+        <button class="copy-btn" onclick="copyCard(this)">📋 複製</button>
+        <button class="back-btn" onclick="backToToc()">🔝 回到總覽</button>
+      </div>
+    </div>
+    <div class="card-body">壹、電訪目的：媒合成功確認。
+
+貳、電訪內容：家長已和托育人員確定於<span class="placeholder">(預定開始收托日期)</span>開始進行托育。
+
+一、提醒事項：
+
+二、宣導事項：
+
+1. 家長<span class="placeholder">(家長姓名)</span>登記找在宅托育人員，預計<span class="placeholder">(預計開始托育時間)</span>開始托育，訪員於<span class="placeholder">115/1/12</span>轉介<span class="placeholder">許</span>托育人員給家長。
+
+2. 訪員與托育人員、家長確認媒合成功，預計<span class="placeholder">(初步說定開始托育時間)</span>開始托育，訪員用LINE提醒應於收托7日內回傳收托表、契約書、家長個資同意書、兒童資料卡，托育人員表示知悉。
+
+後續計畫：追蹤收托通報、並安排新收托訪視。</div>
+  </div>
+
+  <div class="card" id="card-5" data-category="caregiver" data-keywords="在職訓練 時數 CPR">
+    <div class="card-header">
+      <div class="card-title">保母提醒在職訓練電訪 <span class="tag caregiver">保母</span></div>
+      <div class="action-buttons">
+        <button class="copy-btn" onclick="copyCard(this)">📋 複製</button>
+        <button class="back-btn" onclick="backToToc()">🔝 回到總覽</button>
+      </div>
+    </div>
+    <div class="card-body">去電托育人員，提醒今年底前應完成在職訓練時數 <span class="placeholder">___</span> 小時、CPR <span class="placeholder">___</span> 小時，然目前查詢托育人員已完成 <span class="placeholder">___</span> 小時，提醒托育人員盡快完成，如需協助，請洽詢中心。</div>
+  </div>
+
+  <div class="card" id="card-6" data-category="caregiver" data-keywords="體檢 博仁醫院 補助">
+    <div class="card-header">
+      <div class="card-title">保母提醒體檢電訪 <span class="tag caregiver">保母</span></div>
+      <div class="action-buttons">
+        <button class="copy-btn" onclick="copyCard(this)">📋 複製</button>
+        <button class="back-btn" onclick="backToToc()">🔝 回到總覽</button>
+      </div>
+    </div>
+    <div class="card-body">去電托育人員，提醒兩年一次體檢應於<span class="placeholder">(日期)</span>前完成，提醒托育人員應在期限前安排體檢、並回傳體檢報告。
+
+（如有補助）托育人員如到博仁醫院體檢無須付費，到其他醫院應保留體檢收據正本等待中心退費（最高補助1000元，不超過1000元則核實補助）。</div>
+  </div>
+
+  <div class="card" id="card-7" data-category="caregiver" data-keywords="搬家 換發 在宅 登記證">
+    <div class="card-header">
+      <div class="card-title">保母 (在宅) 搬家電訪 <span class="tag caregiver">保母</span></div>
+      <div class="action-buttons">
+        <button class="copy-btn" onclick="copyCard(this)">📋 複製</button>
+        <button class="back-btn" onclick="backToToc()">🔝 回到總覽</button>
+      </div>
+    </div>
+    <div class="card-body">致電托育人員提醒，依據法規，在宅托育地搬遷應於完成換發之後才能在新托育地托育。請托育人員在搬家前一個月提出換發申請、並預備好新托育地環評，待實地審查通過、並經社會局換發作業核發新登記證後，才能在新托育地托育。
+
+已提供更換托育地注意事項文件。</div>
+  </div>
+
+  <div class="card" id="card-8" data-category="caregiver" data-keywords="收托通報 LINE 契約修改">
+    <div class="card-header">
+      <div class="card-title">保母收托通報電訪 <span class="tag caregiver">保母</span></div>
+      <div class="action-buttons">
+        <button class="copy-btn" onclick="copyCard(this)">📋 複製</button>
+        <button class="back-btn" onclick="backToToc()">🔝 回到總覽</button>
+      </div>
+    </div>
+    <div class="card-body">收到托育人員LINE通報之幼兒 <span class="placeholder">___</span> 收托資料，
+
+請托育人員與家長修改契約：
+
+已收悉，請托育人員轉知家長補助申請事宜。</div>
+  </div>
+
+</div>
+
+<div class="no-result" id="noResult">找不到符合的電訪稿，請換個關鍵字試試。</div>
+
+<footer>共 9 則電訪紀錄格式（家長類 4 則、保母類 5 則，「媒合成功電訪」內容通用故兩類皆收錄）</footer>
+
+<div class="toast" id="toast">已複製到剪貼簿 ✓</div>
+
+<script>
+let currentFilter = 'all';
+
+function buildToc(){
+  const tocParent = document.getElementById('tocParent');
+  const tocCaregiver = document.getElementById('tocCaregiver');
+  document.querySelectorAll('.card').forEach(card=>{
+    const title = card.querySelector('.card-title').childNodes[0].textContent.trim();
+    const category = card.getAttribute('data-category');
+    const item = document.createElement('div');
+    item.className = 'toc-item ' + category;
+    item.innerText = title;
+    item.onclick = ()=>{
+      if(currentFilter !== 'all' && currentFilter !== category){
+        setCategoryFilter('all');
+      }
+      card.scrollIntoView({behavior:'smooth', block:'center'});
+      card.classList.remove('flash');
+      void card.offsetWidth;
+      card.classList.add('flash');
+    };
+    (category === 'parent' ? tocParent : tocCaregiver).appendChild(item);
+  });
+}
+buildToc();
+
+function setCategoryFilter(filter){
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.getAttribute('data-filter') === filter);
+  });
+  applyFilters();
+}
+
+function applyFilters(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const cards = document.querySelectorAll('.card');
+  let visibleCount = 0;
+  cards.forEach(card=>{
+    const category = card.getAttribute('data-category');
+    const categoryMatch = currentFilter === 'all' || currentFilter === category;
+    const title = card.querySelector('.card-title').innerText.toLowerCase();
+    const kw = (card.getAttribute('data-keywords')||'').toLowerCase();
+    const body = card.querySelector('.card-body').innerText.toLowerCase();
+    const searchMatch = !q || title.includes(q) || kw.includes(q) || body.includes(q);
+    const show = categoryMatch && searchMatch;
+    card.style.display = show ? '' : 'none';
+    if(show) visibleCount++;
+  });
+
+  document.querySelectorAll('.section-heading').forEach(heading=>{
+    const section = heading.getAttribute('data-section');
+    const sectionVisible = Array.from(document.querySelectorAll('.card[data-category="'+section+'"]'))
+      .some(c => c.style.display !== 'none');
+    heading.style.display = sectionVisible ? '' : 'none';
+  });
+
+  document.getElementById('noResult').style.display = visibleCount===0 ? 'block' : 'none';
+}
+
+function filterCards(){
+  applyFilters();
+}
+
+function copyAll(){
+  const visibleCards = Array.from(document.querySelectorAll('.card')).filter(c => c.style.display !== 'none');
+  let combined = visibleCards.map(card=>{
+    const title = card.querySelector('.card-title').childNodes[0].textContent.trim();
+    const body = card.querySelector('.card-body').innerText;
+    return '【' + title + '】\n' + body;
+  });
+  const text = combined.join('\n\n' + '─'.repeat(20) + '\n\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast('已複製 ' + visibleCards.length + ' 則電訪稿 ✓');
+  }).catch(()=>{
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('已複製 ' + visibleCards.length + ' 則電訪稿 ✓');
+  });
+}
+
+function backToToc(){
+  document.getElementById('tocWrap').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function copyCard(btn){
+  const body = btn.closest('.card').querySelector('.card-body');
+  const text = body.innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast();
+    const original = btn.innerHTML;
+    btn.innerHTML = '✓ 已複製';
+    btn.classList.add('copied');
+    setTimeout(()=>{
+      btn.innerHTML = original;
+      btn.classList.remove('copied');
+    },1500);
+  }).catch(()=>{
+    const range = document.createRange();
+    range.selectNode(body);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    showToast();
+  });
+}
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.innerText = msg || '已複製到剪貼簿 ✓';
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),1600);
+}
+</script>
+
+</body>
+</html>
