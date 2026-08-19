@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>居家托育訪視輔導紀錄產生器</title>
+<style>
+  :root{
+    --navy:#122B3C;
+    --navy-2:#1C3F55;
+    --teal:#1F6F6B;
+    --teal-2:#2C8C86;
+    --mint:#8FD9C4;
+    --mint-deep:#4FAE9A;
+    --paper:#F3F6F5;
+    --card:#FFFFFF;
+    --ink:#16232A;
+    --ink-soft:#4B5D63;
+    --line:#DCE6E4;
+    --amber:#B5651D;
+    --amber-bg:#FBF0E4;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.7;
+  }
+  .topbar{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 55%,var(--teal) 130%);
+    color:#fff;
+    padding:26px 20px 22px;
+  }
+  .topbar-inner{max-width:820px;margin:0 auto;}
+  .eyebrow{
+    font-size:12.5px;letter-spacing:.14em;color:var(--mint);font-weight:700;
+    margin-bottom:6px;display:flex;align-items:center;gap:8px;
+  }
+  .eyebrow::before{content:"";width:18px;height:2px;background:var(--mint);display:inline-block;}
+  h1{font-size:21px;margin:0 0 6px;font-weight:800;letter-spacing:.02em;}
+  .subtitle{font-size:13.5px;color:#CFE3DE;margin-bottom:0;}
+
+  .wrap{max-width:820px;margin:0 auto;padding:22px 16px 80px;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px 22px 24px;
+    margin-bottom:18px;
+  }
+  .card h2{font-size:16px;margin:0 0 4px;color:var(--navy);font-weight:800;}
+  .card .desc{font-size:12.5px;color:var(--ink-soft);margin:0 0 18px;}
+
+  .field{margin-bottom:14px;}
+  .field label{
+    display:flex;align-items:center;gap:6px;
+    font-size:13px;font-weight:700;color:var(--navy-2);margin-bottom:6px;
+  }
+  .field .req{color:var(--amber);font-weight:800;}
+  .field input, .field select, .field textarea{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-family:inherit;
+    font-size:14px;
+    background:var(--paper);
+    color:var(--ink);
+    resize:vertical;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:2px solid var(--teal-2);
+    outline-offset:1px;
+    background:var(--card);
+  }
+  .field .hint{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:640px){.row2{grid-template-columns:1fr;}}
+
+  .actions{display:flex;gap:12px;margin:20px 0 4px;flex-wrap:wrap;}
+  button.gen{
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    padding:11px 22px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .15s;
+  }
+  button.gen:hover{background:var(--navy-2);}
+  button.gen[disabled]{background:var(--ink-soft);cursor:not-allowed;}
+  button.copy{
+    background:transparent;
+    color:var(--teal);
+    border:1px solid var(--teal);
+    padding:11px 22px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+    transition:all .15s;
+  }
+  button.copy:hover{background:var(--teal);color:#fff;}
+  button.copy.copied{background:var(--mint-deep);border-color:var(--mint-deep);color:#fff;}
+
+  .spinner{
+    display:inline-block;width:13px;height:13px;
+    border:2px solid rgba(255,255,255,0.4);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    margin-right:8px;vertical-align:-2px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .status-line{font-size:12px;color:var(--ink-soft);margin:10px 0 0;min-height:16px;}
+  .status-line.error{color:#9A3324;}
+
+  .output-label{
+    font-size:12px;color:var(--ink-soft);margin:20px 0 8px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .output-label::before{content:"";width:6px;height:6px;background:var(--mint-deep);border-radius:50%;display:inline-block;}
+  textarea.output{
+    width:100%;min-height:320px;padding:18px;
+    border:1px solid var(--line);border-radius:8px;
+    background:#FAFCFB;
+    font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+    font-size:14px;line-height:1.85;color:var(--ink);white-space:pre-wrap;
+  }
+
+  .warn-box{
+    background:var(--amber-bg);
+    border:1px solid #ECD6B8;
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:12.5px;
+    color:#7A4718;
+    line-height:1.6;
+    margin-bottom:18px;
+  }
+  .warn-box b{color:var(--amber);}
+
+  details.prompt-toggle{margin:16px 0 0;}
+  details.prompt-toggle summary{font-size:12px;color:var(--navy-2);cursor:pointer;font-weight:700;user-select:none;}
+  details.prompt-toggle textarea{
+    width:100%;margin-top:10px;min-height:140px;padding:14px;
+    border:1px dashed var(--line);border-radius:8px;background:var(--paper);
+    font-size:12px;line-height:1.6;color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:14px;left:14px;z-index:9999;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.92);color:#122B3C;text-decoration:none;font-family:'Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif;font-size:13.5px;font-weight:700;padding:8px 14px;border-radius:999px;box-shadow:0 2px 10px rgba(0,0,0,0.18);border:1px solid rgba(0,0,0,0.06);">← 回首頁</a>
+<div style="background:var(--navy);color:#fff;text-align:center;padding:14px 10px;font-size:22px;font-weight:700;letter-spacing:0.06em;">
+  彭婉如基金會專用
+</div>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="eyebrow">訪視輔導 · 紀錄產生</div>
+    <h1>居家托育訪視輔導紀錄產生器</h1>
+    <p class="subtitle">輸入現場情況重點，AI 依固定格式產出「內容 / 初步處理 / 後續規劃 / 依據法規」四段紀錄</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="warn-box">
+    <b>使用提醒：</b>本工具僅協助整理文字草稿，非正式紀錄。「依據法規」段落由 AI 判斷產出，正式陳報或存檔前，請務必自行核對最新條文與條號是否正確；「初步處理」與「後續規劃」也請依實際現場狀況調整後再使用。
+  </div>
+
+  <div class="card">
+    <h2>情境資訊輸入</h2>
+    <p class="desc">只需填寫下方欄位重點（可用條列或口語敘述），不需自己寫成公文語氣，AI 會統一改寫。</p>
+
+    <div class="field">
+      <label>訪視類型</label>
+      <select id="q_type">
+        <option>一般例行訪視</option>
+        <option>申訴/陳情案件訪視</option>
+        <option>裁罰後複查訪視</option>
+        <option>電話訪視</option>
+        <option>其他</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>事件經過與現場觀察 <span class="req">＊必填</span></label>
+      <textarea id="q_desc" rows="6" placeholder="請描述：發生什麼事、現場看到什麼狀況、保母或家長說了什麼……可以用口語、條列、不完整的句子，AI 會整理成公文語氣。"></textarea>
+    </div>
+
+    <div class="field">
+      <label>保母／家長陳述內容（若有，可另外補充）</label>
+      <textarea id="q_statement" rows="3" placeholder="例：保母表示因臨時有事外出約10分鐘，家長表示未察覺異狀……（若已寫在上方「事件經過」欄，此欄可留空）"></textarea>
+    </div>
+
+    <div class="field">
+      <label>已知適用法規（若你已確定條號，請填入）</label>
+      <input id="q_law" placeholder="例：兒童及少年福利與權益保障法第26條之1（留空則由AI判斷是否有把握列出）">
+    </div>
+
+    <div class="actions">
+      <button class="gen" id="runBtn" onclick="runAI()">AI 產生訪視輔導紀錄</button>
+      <button class="copy" id="copyBtn" onclick="copyOut()">複製結果</button>
+    </div>
+    <p class="status-line" id="status"></p>
+
+    <details class="prompt-toggle">
+      <summary>查看／複製送出的完整指令</summary>
+      <textarea readonly id="promptBox"></textarea>
+    </details>
+
+    <p class="output-label">紀錄結果</p>
+    <textarea class="output" id="out" readonly placeholder="按上方按鈕，AI 將依固定格式產出訪視輔導紀錄……"></textarea>
+  </div>
+
+</div>
+
+<script>
+/* ====== Cloudflare Worker 代理設定 ======
+   沿用教保專業文件產生器相同的 Worker，金鑰安全存放在 Worker 端，網頁不會出現金鑰。
+   如需改用其他 Worker，只要換這一行網址即可。
+*/
+const WORKER_URL = "https://weathered-night-8ab0.lanlan231265.workers.dev";
+
+function val(id, fallback){
+  const el = document.getElementById(id);
+  const v = el.value.trim();
+  return v ? v : fallback;
+}
+
+function buildPrompt(){
+  const type = document.getElementById('q_type').value;
+  const desc = val('q_desc', '（未填寫，請提醒使用者需補充事件經過）');
+  const statement = val('q_statement', '（無另外提供，若事件經過欄已包含陳述內容則一併納入）');
+  const law = val('q_law', '（未提供，請你自行判斷是否有把握列出精確法規條號；若無把握，寧可整段省略，不可臆測或捏造條號）');
+
+  return `你是一位資深居家式托育服務訪視輔導紀錄撰寫顧問，熟悉臺灣居家托育相關法規（如兒童及少年福利與權益保障法、居家式托育服務提供者登記及管理辦法及各縣市自治法規），並精通公文書客觀敘事語言。
+
+請根據以下訪視現場資訊，撰寫一份正式的「居家托育訪視輔導紀錄」。
+
+【訪視情境資訊】
+- 訪視類型：${type}
+- 事件經過與現場觀察：
+${desc}
+- 保母／家長陳述內容：${statement}
+- 已知／擬引用法規：${law}
+
+【輸出格式，請務必逐一產出以下標題與內容，標題文字須完整保留，全篇不得使用任何 Markdown 符號（不可出現 #、*、-、\`\`\` 等），以純文字輸出，段落之間空一行】
+
+居家托育訪視輔導紀錄
+
+內容：
+（以客觀、中立的公文書語言，具體敘述事件經過、現場觀察到的狀況、保母/家長陳述內容；不得出現任何占位符號如❌❌❌；若某項資訊未提供，自然省略、不要編造內容）
+
+初步處理：
+（僅能敘述以下性質之現場作為：口頭說明相關規定、現場宣導、提醒保母注意改善事項、現場指導等；絕對不可出現「開立罰單」「當場裁罰」等現場開單動作之敘述，即使內容涉及疑似違規也一樣，因裁罰為後續行政程序而非現場動作）
+
+後續規劃：
+（請依「事件經過與現場觀察」內容自行判斷：若明顯涉及違規事項且已查證屬實，載明陳報所屬主管機關之後續行政程序；若僅為一般提醒、尚待查證或無違規疑慮，僅需敘述電話或再次訪視確認改善情形等一般追蹤安排，不要提及陳報）
+
+依據法規：
+（僅在你有相當把握時，精準列出法規名稱與條號及規範內容；若不確定精確條文，或情境無明顯對應法規，請將本段標題與內容整行省略、不要輸出，切勿臆測或捏造法規條號）
+
+請開始撰寫：`;
+}
+
+async function runAI(){
+  const desc = document.getElementById('q_desc').value.trim();
+  const status = document.getElementById('status');
+  if(!desc){
+    status.classList.add('error');
+    status.textContent = '請先填寫「事件經過與現場觀察」欄位。';
+    return;
+  }
+
+  const prompt = buildPrompt();
+  document.getElementById('promptBox').value = prompt;
+
+  const btn = document.getElementById('runBtn');
+  const out = document.getElementById('out');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>AI 生成中，請稍候……';
+  status.classList.remove('error');
+  status.textContent = '正在依你填寫的內容生成紀錄，通常需要 10-30 秒。';
+  out.value = '';
+
+  try{
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      const msg = (data && data.error && data.error.message) ? data.error.message : ('伺服器回應狀態：' + response.status);
+      throw new Error(msg);
+    }
+
+    const candidate = data.candidates && data.candidates[0];
+    const text = candidate && candidate.content && candidate.content.parts
+      ? candidate.content.parts.map(p => p.text || '').join('\n')
+      : '';
+
+    if(!text){
+      throw new Error('未收到內容，可能是內容被安全機制擋下，請調整欄位內容後重試。');
+    }
+
+    out.value = text;
+    status.textContent = '已完成生成。請核對「依據法規」段落條號，並依實際現場狀況調整後再存檔或陳報。';
+  }catch(err){
+    status.classList.add('error');
+    status.textContent = '生成失敗：' + err.message + '（請檢查網路連線後重試）';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'AI 產生訪視輔導紀錄';
+  }
+}
+
+function copyOut(){
+  const ta = document.getElementById('out');
+  if(!ta.value){ return; }
+  ta.select();
+  navigator.clipboard.writeText(ta.value).then(()=>{
+    const btn = document.getElementById('copyBtn');
+    const original = btn.textContent;
+    btn.textContent = '已複製 ✓';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1600);
+  });
+}
+</script>
+</body>
+</html>
